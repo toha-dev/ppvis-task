@@ -44,7 +44,7 @@ class SingleLinkedList : public ListBehaviour<T>, public UnidirectionalIteratorB
     SingleLinkedListIterator iterator_;
   };
 
-  SingleLinkedList() : head_(nullptr), size_(0) {}
+  SingleLinkedList() : head_(nullptr) {}
 
   void PushFront(const T& value) override;
   void PushBack(const T& value) override;
@@ -54,7 +54,7 @@ class SingleLinkedList : public ListBehaviour<T>, public UnidirectionalIteratorB
   void Erase(const UnidirectionalIterator<T>& iterator) override;
   std::shared_ptr<UnidirectionalIterator<T>> Find(const T& value) override;
 
-  bool IsEmpty() const override { return size_ == 0; }
+  bool IsEmpty() const override { return head_ == nullptr; }
 
   std::shared_ptr<UnidirectionalIterator<T>> Begin() override {
     return std::make_shared<SingleLinkedListIterator>(head_);
@@ -69,8 +69,6 @@ class SingleLinkedList : public ListBehaviour<T>, public UnidirectionalIteratorB
   void Clear();
 
   std::shared_ptr<Node> head_;
-
-  size_t size_;
 };
 
 template <class T>
@@ -80,8 +78,6 @@ void SingleLinkedList<T>::PushFront(const T& value) {
   } else {
     head_ = std::make_shared<Node>(value, head_);
   }
-
-  ++size_;
 }
 
 template <class T>
@@ -95,8 +91,6 @@ void SingleLinkedList<T>::PushBack(const T& value) {
 
     current->next = std::make_shared<Node>(value, nullptr);
   }
-
-  ++size_;
 }
 
 template <class T>
@@ -105,13 +99,11 @@ void SingleLinkedList<T>::PopFront() {
     return; // TODO: Throw exception instead
   }
 
-  if (size_ == 1) {
+  if (head_->next == nullptr) {
     Clear();
   } else {
     head_ = head_->next;
   }
-
-  --size_;
 }
 
 template <class T>
@@ -120,7 +112,7 @@ void SingleLinkedList<T>::PopBack() {
     return; // TODO: Throw exception instead
   }
 
-  if (size_ == 1) {
+  if (head_->next == nullptr) {
     Clear();
   } else {
     std::shared_ptr<Node> current(head_);
@@ -129,8 +121,6 @@ void SingleLinkedList<T>::PopBack() {
 
     current->next = nullptr;
   }
-
-  --size_;
 }
 
 template <class T>
