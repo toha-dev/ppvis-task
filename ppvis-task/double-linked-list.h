@@ -54,15 +54,10 @@ class DoubleLinkedList : public ListBehaviour<T>, public BidirectionalIteratorBe
   void PopFront() override;
   void PopBack() override;
 
-  T Front() const override { return head_->value; }
-  T Back() const override { return tail_->value; }
-
-  void Clear() override;
   void Erase(const UnidirectionalIterator<T>& iterator) override;
   std::shared_ptr<UnidirectionalIterator<T>> Find(const T& value) override;
 
-  size_t GetSize() const override { return size_; };
-  bool IsEmpty() const override { return GetSize() == 0; };
+  bool IsEmpty() const override { return size_ == 0; };
 
   std::shared_ptr<BidirectionalIterator<T>> Begin() override {
     return std::make_shared<DoubleLinkedListIterator>(head_);
@@ -74,6 +69,7 @@ class DoubleLinkedList : public ListBehaviour<T>, public BidirectionalIteratorBe
 
  private:
   void InitializeFirstNode(const T& value);
+  void Clear();
 
   size_t size_;
 
@@ -111,7 +107,7 @@ void DoubleLinkedList<T>::PopFront() {
     return; // TODO: Throw exception instead
   }
 
-  if (GetSize() == 1) {
+  if (size_ == 1) {
     Clear();
   } else {
     head_ = head_->next;
@@ -127,7 +123,7 @@ void DoubleLinkedList<T>::PopBack() {
     return; // TODO: Throw exception instead
   }
 
-  if (GetSize() == 1) {
+  if (size_ == 1) {
     Clear();
   } else {
     tail_ = tail_->previous;

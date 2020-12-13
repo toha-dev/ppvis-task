@@ -104,8 +104,7 @@ void TestQueueDouble() {
   }
 }
 
-int main()
-{
+int main() {
   PrintTestSingleList();
 
   std::cout << "*****************************" << std::endl;

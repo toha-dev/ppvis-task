@@ -44,22 +44,17 @@ class SingleLinkedList : public ListBehaviour<T>, public UnidirectionalIteratorB
     SingleLinkedListIterator iterator_;
   };
 
-  SingleLinkedList() : head_(nullptr), tail_(nullptr), size_(0) {}
+  SingleLinkedList() : head_(nullptr), size_(0) {}
 
   void PushFront(const T& value) override;
   void PushBack(const T& value) override;
   void PopFront() override;
   void PopBack() override;
 
-  T Front() const override { return head_->value; }
-  T Back() const override { return tail_->value; }
-
-  void Clear() override;
   void Erase(const UnidirectionalIterator<T>& iterator) override;
   std::shared_ptr<UnidirectionalIterator<T>> Find(const T& value) override;
 
-  size_t GetSize() const override { return size_; };
-  bool IsEmpty() const override { return GetSize() == 0; }
+  bool IsEmpty() const override { return size_ == 0; }
 
   std::shared_ptr<UnidirectionalIterator<T>> Begin() override {
     return std::make_shared<SingleLinkedListIterator>(head_);
@@ -71,9 +66,9 @@ class SingleLinkedList : public ListBehaviour<T>, public UnidirectionalIteratorB
 
  private:
   void InitializeFirstNode(const T& value);
+  void Clear();
 
   std::shared_ptr<Node> head_;
-  std::shared_ptr<Node> tail_;
 
   size_t size_;
 };
@@ -94,7 +89,11 @@ void SingleLinkedList<T>::PushBack(const T& value) {
   if (IsEmpty()) {
     InitializeFirstNode(value);
   } else {
-    tail_ = tail_->next = std::make_shared<Node>(value, nullptr);
+    std::shared_ptr<Node> current = head_;
+    while (current != nullptr && current->next != nullptr)
+      current = current->next;
+
+    current->next = std::make_shared<Node>(value, nullptr);
   }
 
   ++size_;
@@ -106,7 +105,7 @@ void SingleLinkedList<T>::PopFront() {
     return; // TODO: Throw exception instead
   }
 
-  if (GetSize() == 1) {
+  if (size_ == 1) {
     Clear();
   } else {
     head_ = head_->next;
@@ -121,15 +120,14 @@ void SingleLinkedList<T>::PopBack() {
     return; // TODO: Throw exception instead
   }
 
-  if (GetSize() == 1) {
+  if (size_ == 1) {
     Clear();
   } else {
     std::shared_ptr<Node> current(head_);
     while (current && current->next && current->next->next)
       current = current->next;
 
-    tail_ = current;
-    tail_->next = nullptr;
+    current->next = nullptr;
   }
 
   --size_;
@@ -137,7 +135,7 @@ void SingleLinkedList<T>::PopBack() {
 
 template <class T>
 void SingleLinkedList<T>::Clear() {
-  head_ = tail_ = nullptr;
+  head_ = nullptr;
 }
 
 template <class T>
@@ -146,7 +144,7 @@ void SingleLinkedList<T>::Erase(const UnidirectionalIterator<T>& iterator) {
 
   if (it.Current() == head_) {
     PopFront();
-  } else if (it.Current() == tail_) {
+  } else if (it.Current()->next == nullptr) {
     PopBack();
   } else {
     std::shared_ptr<Node> current = head_;
@@ -177,5 +175,5 @@ std::shared_ptr<UnidirectionalIterator<T>> SingleLinkedList<T>::Find(const T& va
 
 template <class T>
 void SingleLinkedList<T>::InitializeFirstNode(const T& value) {
-  head_ = tail_ = std::make_shared<Node>(value, nullptr);
+  head_ = std::make_shared<Node>(value, nullptr);
 }
