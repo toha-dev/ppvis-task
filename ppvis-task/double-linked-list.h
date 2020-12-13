@@ -74,7 +74,6 @@ class DoubleLinkedList : public ListBehaviour<T>, public BidirectionalIteratorBe
   size_t size_;
 
   std::shared_ptr<Node> head_;
-  std::shared_ptr<Node> tail_;
 };
 
 template <class T>
@@ -94,8 +93,11 @@ void DoubleLinkedList<T>::PushBack(const T& value) {
   if (IsEmpty()) {
     InitializeFirstNode(value);
   } else {
-    tail_ = std::make_shared<Node>(value, tail_, nullptr);
-    tail_->previous->next = tail_;
+    std::shared_ptr<Node> current = head_;
+    while (current != nullptr && current->next != nullptr)
+      current = current->next;
+
+    current->next = std::make_shared<Node>(value, current, nullptr);
   }
 
   ++size_;
@@ -126,8 +128,11 @@ void DoubleLinkedList<T>::PopBack() {
   if (size_ == 1) {
     Clear();
   } else {
-    tail_ = tail_->previous;
-    tail_->next = nullptr;
+    std::shared_ptr<Node> current = head_;
+    while (current != nullptr && current->next != nullptr)
+      current = current->next;
+
+    current->next = nullptr;
   }
 
   --size_;
@@ -135,7 +140,7 @@ void DoubleLinkedList<T>::PopBack() {
 
 template <class T>
 void DoubleLinkedList<T>::Clear() {
-  head_ = tail_ = nullptr;
+  head_ = nullptr;
 }
 
 template<class T>
@@ -146,7 +151,7 @@ void DoubleLinkedList<T>::Erase(const UnidirectionalIterator<T>& iterator) {
 
   if (current == head_) {
     PopFront();
-  } else if (current == tail_) {
+  } else if (current->next == nullptr) {
     PopBack();
   } else {
     std::shared_ptr<Node> previous = current->previous;
@@ -170,5 +175,5 @@ std::shared_ptr<UnidirectionalIterator<T>> DoubleLinkedList<T>::Find(const T& va
 
 template <class T>
 void DoubleLinkedList<T>::InitializeFirstNode(const T& value) {
-  head_ = tail_ = std::make_shared<Node>(value, nullptr, nullptr);
+  head_ = std::make_shared<Node>(value, nullptr, nullptr);
 }
